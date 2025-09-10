@@ -146,10 +146,3 @@ multilingual Web Development Student & Future Full-Stack Developer :)
 ## 📜 License
 
 This project is licensed under the MIT License.
-
----
-
-✨ Recommendation:
-
-- Edit the README in **your code editor** (so it’s tracked with your commits).
-- Then push it to GitHub (`git add . && git commit -m "Update README" && git push`).
