@@ -140,8 +140,8 @@ GitHub Pages
 
 ## 👩‍💻 Author
 
-Jolanta Simkute
-Multilingual Web Development Student & Future Full-Stack Developer :)
+Jolanta -
+multilingual Web Development Student & Future Full-Stack Developer :)
 
 ## 📜 License
 
