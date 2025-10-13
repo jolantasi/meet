@@ -1,35 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import CitySearch from './components/CitySearch';
+import EventList from './components/EventList';
+import NumberOfEvents from './components/NumberOfEvents';
+import { getEvents } from './api';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [events, setEvents] = useState([]);
+  const [numberOfEvents, setNumberOfEvents] = useState(32);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const allEvents = await getEvents();
+      setEvents(allEvents.slice(0, numberOfEvents));
+    };
+    fetchEvents();
+  }, [numberOfEvents]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <CitySearch data-testid="city-search" />
+      <NumberOfEvents
+        onNumberChange={(num) => setNumberOfEvents(Number(num))}
+      />
+      <EventList events={events} />
+    </div>
+  );
+};
 
-export default App
+export default App;
