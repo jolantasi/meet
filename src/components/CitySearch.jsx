@@ -1,3 +1,4 @@
+// src/components/CitySearch.jsx
 import React, { useState } from 'react';
 
 const CitySearch = ({ allLocations }) => {
@@ -8,8 +9,8 @@ const CitySearch = ({ allLocations }) => {
   const handleInputChanged = (event) => {
     const value = event.target.value;
     const filteredLocations = allLocations
-      ? allLocations.filter((location) =>
-          location.toUpperCase().indexOf(value.toUpperCase()) > -1
+      ? allLocations.filter(location =>
+          location.toUpperCase().includes(value.toUpperCase())
         )
       : [];
     setQuery(value);
@@ -19,7 +20,7 @@ const CitySearch = ({ allLocations }) => {
   const handleItemClicked = (event) => {
     const value = event.target.textContent;
     setQuery(value);
-    setShowSuggestions(false); // hide the suggestions
+    setShowSuggestions(false);
   };
 
   return (
@@ -32,18 +33,16 @@ const CitySearch = ({ allLocations }) => {
         onFocus={() => setShowSuggestions(true)}
         onChange={handleInputChanged}
       />
-      {showSuggestions ? (
+      {showSuggestions && (
         <ul className="suggestions">
-          {suggestions.map((suggestion) => (
-            <li onClick={handleItemClicked} key={suggestion}>
-              {suggestion}
-            </li>
+          {suggestions.map((s) => (
+            <li key={s} onClick={handleItemClicked}>{s}</li>
           ))}
           <li key="See all cities" onClick={handleItemClicked}>
             <b>See all cities</b>
           </li>
         </ul>
-      ) : null}
+      )}
     </div>
   );
 };
