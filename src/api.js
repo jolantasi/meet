@@ -43,7 +43,7 @@ export const getAccessToken = async () => {
     if (!code) {
       // Fetch Google Auth URL from Lambda
       const response = await fetch(
-        'https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/getAuthURL'
+        'https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/'
       );
       const result = await response.json();
       const { authUrl } = result;
