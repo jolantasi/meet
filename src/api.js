@@ -17,13 +17,12 @@ const checkToken = async (accessToken) => {
 const getToken = async (code) => {
   const encodedCode = encodeURIComponent(code);
   const response = await fetch(
-    `https://pktxx7enyhroozlsiu2c4s7yfu0ljlpi.lambda-url.eu-central-1.on.aws/accessToken/${encodedCode}`,
-    { method: 'GET', mode: 'cors' }
+    `https://pktxx7enyhroozlsiu2c4s7yfu0ljlpi.lambda-url.eu-central-1.on.aws/accessToken/${encodedCode}`
   );
   const { access_token } = await response.json();
 
   if (access_token) {
-    localStorage.setItem("access_token", access_token);
+    localStorage.setItem('access_token', access_token);
   }
 
   return access_token;
@@ -33,19 +32,18 @@ const getToken = async (code) => {
  * Get access token from localStorage or via Lambda
  */
 export const getAccessToken = async () => {
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem('access_token');
   const tokenCheck = accessToken && (await checkToken(accessToken));
 
   if (!accessToken || tokenCheck?.error) {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem('access_token');
     const searchParams = new URLSearchParams(window.location.search);
-    const code = searchParams.get("code");
+    const code = searchParams.get('code');
 
     if (!code) {
-      // Fetch the Google Auth URL from Lambda
+      // Fetch Google Auth URL from Lambda
       const response = await fetch(
-        "https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/getAuthURL",
-        { method: 'GET', mode: 'cors' }
+        'https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/getAuthURL'
       );
       const result = await response.json();
       const { authUrl } = result;
@@ -74,37 +72,30 @@ export const extractLocations = (events) => {
  * Remove query parameters from URL
  */
 export const removeQuery = () => {
-  let newUrl;
-  if (window.history.pushState && window.location.pathname) {
-    newUrl =
-      window.location.protocol +
-      "//" +
-      window.location.host +
-      window.location.pathname;
-    window.history.pushState("", "", newUrl);
-  } else {
-    newUrl = window.location.protocol + "//" + window.location.host;
-    window.history.pushState("", "", newUrl);
-  }
+  const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+  window.history.pushState('', '', newUrl);
 };
 
 /**
  * Get calendar events from Lambda or mock data
  */
 export const getEvents = async () => {
-  // For local testing, return mock data
-  if (window.location.href.startsWith("http://localhost")) {
+  // For local testing
+  if (window.location.href.startsWith('http://localhost')) {
     return mockData;
   }
 
-  // Fetch events from Lambda in production
+  // For production
   const token = await getAccessToken();
 
   if (token) {
     removeQuery();
+
     const url = `https://hsk7rllx6us5larpn4yvsaeez40wnenj.lambda-url.eu-central-1.on.aws/${token}`;
-    const response = await fetch(url, { method: 'GET', mode: 'cors' });
+    const response = await fetch(url);
     const result = await response.json();
+
+    console.log('Fetched events from Lambda:', result); // ✅ helpful for debugging
 
     if (result && result.events) {
       return result.events;
