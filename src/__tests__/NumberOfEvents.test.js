@@ -1,31 +1,36 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NumberOfEvents from "../components/NumberOfEvents";
-import EventList from "../components/EventList"; // assuming EventList shows events
+import EventList from "../components/EventList";
 import { getEvents } from "../api";
 
 describe("<NumberOfEvents /> component", () => {
   test("renders a textbox input", () => {
-    render(<NumberOfEvents />);
-    const input = screen.getByRole("spinbutton"); // input type=number
+    const mockSetCurrentNOE = jest.fn();
+    render(<NumberOfEvents currentNOE={32} setCurrentNOE={mockSetCurrentNOE} />);
+    const input = screen.getByRole("spinbutton");
     expect(input).toBeInTheDocument();
   });
 
   test("has default value of 32", () => {
-    render(<NumberOfEvents />);
+    const mockSetCurrentNOE = jest.fn();
+    render(<NumberOfEvents currentNOE={32} setCurrentNOE={mockSetCurrentNOE} />);
     const input = screen.getByRole("spinbutton");
     expect(input.value).toBe("32");
   });
 
   test("user can change the number of events", async () => {
-    const user = userEvent.setup();
-    render(<NumberOfEvents />);
-    const input = screen.getByRole("spinbutton");
-
-    await user.clear(input);
-    await user.type(input, "10");
-    expect(input.value).toBe("10");
-  });
+  const user = userEvent.setup();
+  const mockSetCurrentNOE = jest.fn();
+  render(<NumberOfEvents currentNOE={32} setCurrentNOE={mockSetCurrentNOE} />);
+  const input = screen.getByRole("spinbutton");
+  
+  // Type into the input
+  await user.type(input, "5");
+  
+  // Verify the callback was invoked
+  expect(mockSetCurrentNOE).toHaveBeenCalled();
+});
 });
 
 describe("Integration with EventList", () => {
@@ -42,8 +47,6 @@ describe("Integration with EventList", () => {
   });
 
   test("number of events displayed changes according to user input", async () => {
-    const user = userEvent.setup();
-
     // start with default 32
     const { rerender } = render(<EventList events={allEvents.slice(0, 32)} />);
     let eventItems = screen.getAllByRole("listitem");

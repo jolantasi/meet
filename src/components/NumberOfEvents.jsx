@@ -1,13 +1,9 @@
-import { useState } from "react";
 import PropTypes from "prop-types";
 
-const NumberOfEvents = ({ onNumberChange }) => {
-  const [number, setNumber] = useState(32);
-
+const NumberOfEvents = ({ currentNOE, setCurrentNOE }) => {
   const handleChange = (e) => {
-    const value = e.target.value;
-    setNumber(value);
-    if (onNumberChange) onNumberChange(value);
+    const value = Number(e.target.value);
+    setCurrentNOE(value);
   };
 
   return (
@@ -16,15 +12,17 @@ const NumberOfEvents = ({ onNumberChange }) => {
       <input
         id="number-of-events"
         type="number"
-        value={number}
+        value={currentNOE}
         onChange={handleChange}
+        aria-label="number-of-events"
       />
     </div>
   );
 };
 
 NumberOfEvents.propTypes = {
-  onNumberChange: PropTypes.func,
+  currentNOE: PropTypes.number.isRequired,
+  setCurrentNOE: PropTypes.func.isRequired,
 };
 
 export default NumberOfEvents;

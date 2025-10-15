@@ -7,13 +7,14 @@ import './App.css';
 
 const App = () => {
   const [allLocations, setAllLocations] = useState([]);
-  const [currentNOE, setCurrentNOE] = useState(32);
+  const [currentNOE, setCurrentNOE] = useState(32); // default number of events
   const [events, setEvents] = useState([]);
   const [currentCity, setCurrentCity] = useState('See all cities');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch all events from API
         const allEvents = await getEvents();
 
         if (!allEvents || allEvents.length === 0) {
@@ -23,12 +24,16 @@ const App = () => {
           return;
         }
 
+        // Filter events based on current city
         const filteredEvents =
           currentCity === 'See all cities'
             ? allEvents
             : allEvents.filter((event) => event.location === currentCity);
 
+        // Limit number of events displayed
         setEvents(filteredEvents.slice(0, currentNOE));
+
+        // Extract all locations for CitySearch
         setAllLocations(extractLocations(allEvents));
       } catch (error) {
         console.error('❌ Error fetching events:', error);
@@ -36,7 +41,7 @@ const App = () => {
     };
 
     fetchData();
-  }, [currentCity, currentNOE]);
+  }, [currentCity, currentNOE]); // re-run when city or number of events changes
 
   return (
     <div className="App">
