@@ -102,7 +102,7 @@ export const getEvents = async () => {
 
   if (token) {
     removeQuery();
-    const url = `https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/getCalendarEvents/${token}`;
+    const url = `https://hsk7rllx6us5larpn4yvsaeez40wnenj.lambda-url.eu-central-1.on.aws/${token}`;
     const response = await fetch(url, { method: 'GET', mode: 'cors' });
     const result = await response.json();
 
