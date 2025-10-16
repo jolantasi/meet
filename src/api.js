@@ -1,5 +1,7 @@
 import mockData from './mock-data';
 
+const API_BASE_URL = 'https://dk0a4cdnll.execute-api.eu-central-1.amazonaws.com/dev';
+
 /**
  * Check if access token is valid
  */
@@ -15,17 +17,26 @@ const checkToken = async (accessToken) => {
  * Exchange code for access token
  */
 const getToken = async (code) => {
-  const encodedCode = encodeURIComponent(code);
-  const response = await fetch(
-    `https://pktxx7enyhroozlsiu2c4s7yfu0ljlpi.lambda-url.eu-central-1.on.aws/accessToken/${encodedCode}`
-  );
-  const { access_token } = await response.json();
+  try {
+    const encodedCode = encodeURIComponent(code);
+    const response = await fetch(`https://dk0a4cdnll.execute-api.eu-central-1.amazonaws.com/dev/api/token/${encodedCode}`);
 
-  if (access_token) {
-    localStorage.setItem('access_token', access_token);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const { access_token } = await response.json();
+
+    if (access_token) {
+      localStorage.setItem('access_token', access_token);
+    }
+
+    return access_token;
+
+  } catch (error) {
+    console.error('Error fetching access token:', error);
+    return null; // Return null if fetching token failed
   }
-
-  return access_token;
 };
 
 /**
@@ -37,24 +48,18 @@ export const getAccessToken = async () => {
 
   if (!accessToken || tokenCheck?.error) {
     localStorage.removeItem('access_token');
+
     const searchParams = new URLSearchParams(window.location.search);
     const code = searchParams.get('code');
 
     if (!code) {
-      // Fetch Google Auth URL from Lambda
-      const response = await fetch(
-        'https://cipidgpp3q5nxor5xtmn6fkubi0nnilh.lambda-url.eu-central-1.on.aws/'
-      );
+      const response = await fetch(`${API_BASE_URL}/api/get-auth-url`);
       const result = await response.json();
-      const { authUrl } = result;
-
-      // Redirect user to Google Auth
-      window.location.href = authUrl;
+      window.location.href = result.authUrl;
       return null;
     }
 
-    // Exchange authorization code for access token
-    return code && getToken(code);
+    return getToken(code);
   }
 
   return accessToken;
@@ -64,8 +69,8 @@ export const getAccessToken = async () => {
  * Extract unique locations from events
  */
 export const extractLocations = (events) => {
-  const extractedLocations = events.map((event) => event.location);
-  return [...new Set(extractedLocations)];
+  const locations = events.map((event) => event.location);
+  return [...new Set(locations)];
 };
 
 /**
@@ -80,27 +85,22 @@ export const removeQuery = () => {
  * Get calendar events from Lambda or mock data
  */
 export const getEvents = async () => {
-  // For local testing
+  // Local testing
   if (window.location.href.startsWith('http://localhost')) {
     return mockData;
   }
 
-  // For production
+  // Production
   const token = await getAccessToken();
+  if (!token) return [];
 
-  if (token) {
-    removeQuery();
+  removeQuery();
 
-    const url = `https://hsk7rllx6us5larpn4yvsaeez40wnenj.lambda-url.eu-central-1.on.aws/${token}`;
-    const response = await fetch(url);
-    const result = await response.json();
+  const url = `${API_BASE_URL}/api/get-events/${token}`;
+  const response = await fetch(url);
+  const result = await response.json();
 
-    console.log('Fetched events from Lambda:', result); // ✅ helpful for debugging
+  console.log('Fetched events from Lambda:', result); // helpful for debugging
 
-    if (result && result.events) {
-      return result.events;
-    }
-  }
-
-  return [];
+  return result.events || [];
 };
