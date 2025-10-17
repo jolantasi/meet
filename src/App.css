@@ -2,19 +2,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@400;500&display=swap');
 
 /* Base */
-body, html {
+html, body {
   margin: 0;
   padding: 0;
+  min-height: 100%;
+  width: 100%;
   font-family: 'Roboto', Arial, sans-serif;
-  background-color: #111; /* dark background */
-  color: #E6C76C; /* softer gold */
+  background-color: #111;
+  color: #E6C76C;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* horizontally center the App */
 }
 
 .App {
-  text-align: center;
-  padding: 2% 5%;
+  width: 100%;
   max-width: 1200px;
-  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* horizontally center content */
+  text-align: center;
+  padding: 20px 5%;
 }
 
 /* Universal box-sizing */
@@ -85,25 +96,24 @@ input::placeholder {
 .event-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* centers cards horizontally */
   gap: 15px;
-  margin: 20px auto;
   width: 100%;
-  max-width: 800px;
+  max-width: 900px; /* cards will not exceed this width */
+  margin: 20px 0; /* spacing from top/bottom */
 }
 
 /* Event cards */
 .event {
-  width: 100%;
-  max-width: 600px;
-  padding: 15px 15px 45px;
-  text-align: left;
+  width: 100%;        /* stretches to parent width */
+  max-width: 900px;   /* never too wide */
+  padding: 20px 25px 50px;
+  text-align: center;
   border-radius: 8px;
   position: relative;
-  background: linear-gradient(145deg, #1a1a1a, #222);
+  background: linear-gradient(145deg, #141414, #1c1c1c);
   border: 1px solid #E6C76C;
   box-shadow: 0 6px 16px rgba(0,0,0,0.6);
-  transition: transform 0.2s, box-shadow 0.2s;
   font-family: 'Playfair Display', serif;
 }
 
@@ -147,17 +157,19 @@ input::placeholder {
   color: #111;
 }
 
-/* Responsive */
 @media screen and (max-width: 768px) {
   .App {
-    padding: 5%;
+    padding: 15px 5%;
   }
 
-  .event, .suggestions {
-    max-width: 90%;
+  .event-list,
+  .event {
+    max-width: 100%;
   }
 
-  input[type="text"], input[type="number"] {
+  input[type="text"],
+  input[type="number"] {
     max-width: 100%;
   }
 }
+
