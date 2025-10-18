@@ -11,7 +11,7 @@ const Event = ({ event }) => {
   return (
     <li className="event">
       <h2 className="event-title">{event.summary}</h2>
-      <p className="event-start">Start: {event.start.dateTime}</p>
+      <p className="event-start">Start: {new Date(event.start.dateTime).toUTCString().replace(/:\d{2} GMT$/, ' GMT')}</p>
       <p className="event-location">Location: {event.location}</p>
 
       <button className="details-btn" onClick={handleToggleDetails}>
