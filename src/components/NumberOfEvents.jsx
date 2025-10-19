@@ -1,13 +1,29 @@
+import React from "react";
 import PropTypes from "prop-types";
 
-const NumberOfEvents = ({ currentNOE, setCurrentNOE }) => {
+const NumberOfEvents = ({ currentNOE, setCurrentNOE, setErrorText }) => {
   const handleChange = (e) => {
-    const value = Number(e.target.value);
-    setCurrentNOE(value);
+    const value = e.target.value; // keep as string while typing
+
+    // allow empty string while typing
+    if (value === "") {
+      setCurrentNOE(value);
+      setErrorText(""); 
+      return;
+    }
+
+    const numberValue = Number(value);
+
+    if (isNaN(numberValue) || numberValue <= 0 || numberValue > 32) {
+      setErrorText("Please enter a valid number of events (1-32).");
+    } else {
+      setErrorText(""); 
+      setCurrentNOE(numberValue);
+    }
   };
 
   return (
-    <div>
+    <div className="number-of-events">
       <label htmlFor="number-of-events">Number of events:</label>
       <input
         id="number-of-events"
@@ -21,8 +37,9 @@ const NumberOfEvents = ({ currentNOE, setCurrentNOE }) => {
 };
 
 NumberOfEvents.propTypes = {
-  currentNOE: PropTypes.number.isRequired,
+  currentNOE: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   setCurrentNOE: PropTypes.func.isRequired,
+  setErrorText: PropTypes.func.isRequired,
 };
 
 export default NumberOfEvents;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, within, screen } from '@testing-library/react'; // Add screen here
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getEvents } from '../api';
 import App from '../App';
@@ -11,20 +11,17 @@ describe('<App /> component', () => {
   });
 
   test('renders list of events', () => {
-    // Use querySelector with existing id
     const eventList = AppDOM.querySelector('#event-list');
     expect(eventList).toBeInTheDocument();
   });
 
   test('renders CitySearch', () => {
-    // Use querySelector with existing id
     const citySearch = AppDOM.querySelector('#city-search');
     expect(citySearch).toBeInTheDocument();
   });
 
   test('renders NumberOfEvents component', () => {
-    const { container } = render(<App />);
-    const numberInput = container.querySelector('#number-of-events'); // input type=number
+    const numberInput = AppDOM.querySelector('#number-of-events');
     expect(numberInput).toBeInTheDocument();
   });
 });
@@ -46,9 +43,7 @@ describe('<App /> integration', () => {
     const allRenderedEventItems = within(EventListDOM).queryAllByRole('listitem');
 
     const allEvents = await getEvents();
-    const berlinEvents = allEvents.filter(
-      event => event.location === 'Berlin, Germany'
-    );
+    const berlinEvents = allEvents.filter(event => event.location === 'Berlin, Germany');
 
     expect(allRenderedEventItems.length).toBe(berlinEvents.length);
     allRenderedEventItems.forEach(event => {
@@ -57,21 +52,20 @@ describe('<App /> integration', () => {
   });
 
   test('user can change number of events displayed', async () => {
-    const user = userEvent.setup(); // Add this for consistency
+    const user = userEvent.setup();
     const AppComponent = render(<App />);
     const AppDOM = AppComponent.container.firstChild;
 
-    // Find the input box for number of events using querySelector (consistent with your other tests)
     const numberOfEventsInput = AppDOM.querySelector('#number-of-events');
 
-    // Erase default "32" and type "10"
+    // Clear default and type new number
     await user.clear(numberOfEventsInput);
     await user.type(numberOfEventsInput, '10');
 
-    // Check that the correct number of events is displayed
+    // Wait for events to update
     const EventListDOM = AppDOM.querySelector('#event-list');
     const events = within(EventListDOM).queryAllByRole('listitem');
-    
-    expect(events).toHaveLength(10);
+
+    expect(events.length).toBe(10);
   });
 });

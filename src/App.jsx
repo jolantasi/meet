@@ -4,12 +4,15 @@ import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
 import { extractLocations, getEvents } from './api';
 import './App.css';
+import { InfoAlert, ErrorAlert } from './components/Alert';
 
 const App = () => {
   const [allLocations, setAllLocations] = useState([]);
   const [currentNOE, setCurrentNOE] = useState(32); // default number of events
   const [events, setEvents] = useState([]);
   const [currentCity, setCurrentCity] = useState('See all cities');
+  const [infoAlert, setInfoAlert] = useState("");
+  const [errorText, setErrorText] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,13 +47,33 @@ const App = () => {
   }, [currentCity, currentNOE]); // re-run when city or number of events changes
 
   return (
-    <div className="App">
-      <h1 className="app-title">Meet App</h1>
-      <CitySearch allLocations={allLocations} setCurrentCity={setCurrentCity} />
-      <NumberOfEvents setCurrentNOE={setCurrentNOE} currentNOE={currentNOE} />
-      <EventList events={events} />
+  <div className="App">
+    <div className="alerts-container">
+      {/* Render InfoAlert if there is info text */}
+      {infoAlert.length > 0 && <InfoAlert text={infoAlert} />}
+      
+      {/* Render ErrorAlert if there is error text */}
+      {errorText.length > 0 && <ErrorAlert text={errorText} />}
     </div>
-  );
-};
+
+    <CitySearch
+      allLocations={allLocations}
+      setCurrentCity={setCurrentCity}
+      setInfoAlert={setInfoAlert}
+      setErrorText={setErrorText} // pass setter to CitySearch so it can trigger error alerts
+    />
+
+    <NumberOfEvents
+      currentNOE={currentNOE}
+      setCurrentNOE={setCurrentNOE}
+      setErrorText={setErrorText}
+    />
+
+    <EventList events={events} />
+  </div>
+);
+
+
+}; 
 
 export default App;

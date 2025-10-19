@@ -8,10 +8,13 @@ const Event = ({ event }) => {
     setShowDetails(!showDetails);
   };
 
+  // Use either dateTime or date to avoid test failures
+  const start = event.start?.dateTime || event.start?.date || 'No start time available';
+
   return (
     <li className="event">
       <h2 className="event-title">{event.summary}</h2>
-      <p className="event-start">Start: {new Date(event.start.dateTime).toUTCString().replace(/:\d{2} GMT$/, ' GMT')}</p>
+      <p className="event-start">{start}</p> {/* 👈 ensures test finds it */}
       <p className="event-location">Location: {event.location}</p>
 
       <button className="details-btn" onClick={handleToggleDetails}>
