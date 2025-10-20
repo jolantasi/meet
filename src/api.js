@@ -1,4 +1,12 @@
+import NProgress from 'nprogress'; // make sure you have this at the top if not already imported
+import 'nprogress/nprogress.css';
 import mockData from './mock-data';
+
+NProgress.configure({
+  showSpinner: false,  // hides the spinning circle
+  speed: 400,          // animation speed
+  minimum: 0.2         // how early the bar appears
+});
 
 const API_BASE_URL = 'https://dk0a4cdnll.execute-api.eu-central-1.amazonaws.com/dev';
 
@@ -90,6 +98,13 @@ export const getEvents = async () => {
     return mockData;
   }
 
+  // Offline check
+  if (!navigator.onLine) {
+    const events = localStorage.getItem('lastEvents');
+    NProgress.done();
+    return events ? JSON.parse(events) : [];
+  }
+
   // Production
   const token = await getAccessToken();
   if (!token) return [];
@@ -97,10 +112,28 @@ export const getEvents = async () => {
   removeQuery();
 
   const url = `${API_BASE_URL}/api/get-events/${token}`;
+NProgress.start();
+
+try {
   const response = await fetch(url);
   const result = await response.json();
 
-  console.log('Fetched events from Lambda:', result); // helpful for debugging
+  if (result?.events) {
+    localStorage.setItem('lastEvents', JSON.stringify(result.events));
+    return result.events;
+  } else {
+    // No events returned, fallback to empty array
+    return [];
+  }
 
-  return result.events || [];
+} catch (error) {
+  console.error('Error fetching events:', error);
+
+  // Offline fallback: return saved events if available
+  const savedEvents = localStorage.getItem('lastEvents');
+  return savedEvents ? JSON.parse(savedEvents) : [];
+} finally {
+  NProgress.done();
+}
+
 };
