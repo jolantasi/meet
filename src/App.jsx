@@ -4,7 +4,7 @@ import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
 import { extractLocations, getEvents } from './api';
 import './App.css';
-import { InfoAlert, ErrorAlert } from './components/Alert';
+import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
 
 const App = () => {
   const [allLocations, setAllLocations] = useState([]);
@@ -13,11 +13,11 @@ const App = () => {
   const [currentCity, setCurrentCity] = useState('See all cities');
   const [infoAlert, setInfoAlert] = useState("");
   const [errorText, setErrorText] = useState('');
+  const [warningText, setWarningText] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all events from API
         const allEvents = await getEvents();
 
         if (!allEvents || allEvents.length === 0) {
@@ -27,21 +27,24 @@ const App = () => {
           return;
         }
 
-        // Filter events based on current city
         const filteredEvents =
           currentCity === 'See all cities'
             ? allEvents
             : allEvents.filter((event) => event.location === currentCity);
 
-        // Limit number of events displayed
         setEvents(filteredEvents.slice(0, currentNOE));
 
-        // Extract all locations for CitySearch
         setAllLocations(extractLocations(allEvents));
       } catch (error) {
         console.error('❌ Error fetching events:', error);
       }
     };
+
+    if (navigator.onLine) {
+    setWarningText(''); // clear warning if online
+    } else {
+    setWarningText('You are offline. Events are loaded from cache and may be outdated.');
+  }
 
     fetchData();
   }, [currentCity, currentNOE]); // re-run when city or number of events changes
@@ -54,6 +57,7 @@ const App = () => {
       
       {/* Render ErrorAlert if there is error text */}
       {errorText.length > 0 && <ErrorAlert text={errorText} />}
+      {warningText.length > 0 && <WarningAlert text={warningText} />}
     </div>
 
     <CitySearch
