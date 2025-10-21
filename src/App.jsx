@@ -16,38 +16,57 @@ const App = () => {
   const [warningText, setWarningText] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const allEvents = await getEvents();
+  const fetchData = async () => {
+    try {
+      const allEvents = await getEvents();
 
-        if (!allEvents || allEvents.length === 0) {
-          console.warn('⚠️ No events found');
-          setEvents([]);
-          setAllLocations([]);
-          return;
-        }
-
-        const filteredEvents =
-          currentCity === 'See all cities'
-            ? allEvents
-            : allEvents.filter((event) => event.location === currentCity);
-
-        setEvents(filteredEvents.slice(0, currentNOE));
-
-        setAllLocations(extractLocations(allEvents));
-      } catch (error) {
-        console.error('❌ Error fetching events:', error);
+      if (!allEvents || allEvents.length === 0) {
+        console.warn('⚠️ No events found');
+        setEvents([]);
+        setAllLocations([]);
+        return;
       }
-    };
 
-    if (navigator.onLine) {
-    setWarningText(''); // clear warning if online
-    } else {
+      const filteredEvents =
+        currentCity === 'See all cities'
+          ? allEvents
+          : allEvents.filter((event) => event.location === currentCity);
+
+      setEvents(filteredEvents.slice(0, currentNOE));
+      setAllLocations(extractLocations(allEvents));
+    } catch (error) {
+      console.error('❌ Error fetching events:', error);
+    }
+  };
+
+  // Functions for handling network changes
+  const handleOffline = () => {
+    setWarningText('You are offline. Events are loaded from cache and may be outdated.');
+  };
+
+  const handleOnline = () => {
+    setWarningText('');
+  };
+
+  // Set initial state immediately when the app loads
+  if (navigator.onLine) {
+    setWarningText('');
+  } else {
     setWarningText('You are offline. Events are loaded from cache and may be outdated.');
   }
 
-    fetchData();
-  }, [currentCity, currentNOE]); // re-run when city or number of events changes
+  // Listen for changes in network status
+  window.addEventListener('offline', handleOffline);
+  window.addEventListener('online', handleOnline);
+
+  fetchData();
+
+  // 🧹 Clean up listeners on component unmount
+  return () => {
+    window.removeEventListener('offline', handleOffline);
+    window.removeEventListener('online', handleOnline);
+  };
+}, [currentCity, currentNOE]);
 
   return (
   <div className="App">
@@ -76,7 +95,6 @@ const App = () => {
     <EventList events={events} />
   </div>
 );
-
 
 }; 
 
