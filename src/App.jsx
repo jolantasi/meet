@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
+import CityEventsChart from './components/CityEventsChart';
 import { extractLocations, getEvents } from './api';
 import './App.css';
 import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
@@ -70,6 +71,7 @@ const App = () => {
 
   return (
   <div className="App">
+    <h1>Meet App</h1>
     <div className="alerts-container">
       {/* Render InfoAlert if there is info text */}
       {infoAlert.length > 0 && <InfoAlert text={infoAlert} />}
@@ -91,7 +93,7 @@ const App = () => {
       setCurrentNOE={setCurrentNOE}
       setErrorText={setErrorText}
     />
-
+    <CityEventsChart allLocations={allLocations} events={events} />
     <EventList events={events} />
   </div>
 );
