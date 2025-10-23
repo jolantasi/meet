@@ -93,8 +93,9 @@ export const removeQuery = () => {
  * Get calendar events from Lambda or mock data
  */
 export const getEvents = async () => {
-  // Local testing
-  if (window.location.href.startsWith('http://localhost')) {
+  // Always use mock data during local development
+  if (import.meta.env.DEV) {
+    console.log("💡 Running in dev mode — using mock data");
     return mockData;
   }
 
