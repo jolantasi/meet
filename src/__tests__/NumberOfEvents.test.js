@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NumberOfEvents from "../components/NumberOfEvents";
 import EventList from "../components/EventList";
-import { getEvents } from "../api";
+import mockData from "../mock-data";
 
 describe("<NumberOfEvents /> component", () => {
   test("renders a textbox input", () => {
@@ -43,7 +43,6 @@ describe("<NumberOfEvents /> component", () => {
     );
     const input = screen.getByRole("spinbutton");
 
-    // Clear input before typing
     await user.clear(input);
     await user.type(input, "5");
 
@@ -52,11 +51,8 @@ describe("<NumberOfEvents /> component", () => {
 });
 
 describe("Integration with EventList", () => {
-  let allEvents;
-
-  beforeAll(async () => {
-    allEvents = await getEvents();
-  });
+  // ✅ Use static mock data instead of async getEvents()
+  const allEvents = mockData;
 
   test("default number of events displayed is 32", () => {
     render(<EventList events={allEvents.slice(0, 32)} />);
@@ -64,7 +60,7 @@ describe("Integration with EventList", () => {
     expect(eventItems.length).toBe(32);
   });
 
-  test("number of events displayed changes according to user input", async () => {
+  test("number of events displayed changes according to user input", () => {
     const { rerender } = render(<EventList events={allEvents.slice(0, 32)} />);
     let eventItems = screen.getAllByRole("listitem");
     expect(eventItems.length).toBe(32);

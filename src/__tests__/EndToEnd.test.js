@@ -118,9 +118,9 @@ describe('filter events by city', () => {
     // Optional: Verify each event location contains 'Berlin'
     for (let i = 0; i < events.length; i++) {
       const locationText = await page.$eval(
-        `.event:nth-child(${i + 1}) .event-location`,
-        el => el.textContent
-      );
+  `#event-list li:nth-child(${i + 1}) .event-location`,
+  el => el.textContent
+);
       expect(locationText).toContain('Berlin');
     }
   });

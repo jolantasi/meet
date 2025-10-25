@@ -1,20 +1,17 @@
 // src/components/Event.jsx
 import React, { useState } from 'react';
 
-const Event = ({ event }) => {
+const Event = ({ event = {} }) => {
   const [showDetails, setShowDetails] = useState(false);
 
-  const handleToggleDetails = () => {
-    setShowDetails(!showDetails);
-  };
+  const handleToggleDetails = () => setShowDetails(!showDetails);
 
-  // Use either dateTime or date to avoid test failures
   const start = event.start?.dateTime || event.start?.date || 'No start time available';
 
   return (
-    <li className="event">
+    <div className="event">
       <h2 className="event-title">{event.summary}</h2>
-      <p className="event-start">{start}</p> {/* 👈 ensures test finds it */}
+      <p className="event-start">{start}</p>
       <p className="event-location">Location: {event.location}</p>
 
       <button className="details-btn" onClick={handleToggleDetails}>
@@ -29,7 +26,7 @@ const Event = ({ event }) => {
           </a>
         </div>
       )}
-    </li>
+    </div>
   );
 };
 

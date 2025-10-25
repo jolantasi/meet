@@ -1,5 +1,6 @@
+// src/components/EventGenresChart.jsx
 import { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import { PieChart, Pie, ResponsiveContainer, Cell } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer, Cell, Legend } from 'recharts';
 
 const EventGenresChart = ({ events }) => {
   const [data, setData] = useState([]);
@@ -7,7 +8,7 @@ const EventGenresChart = ({ events }) => {
   const containerRef = useRef(null);
 
   const genres = ['React', 'JavaScript', 'Node', 'jQuery', 'Angular'];
-  const colors = ['#D32F2F', '#1976D2', '#388E3C', '#FBC02D', '#7B1FA2']; // visible on white bg
+  const colors = ['#D32F2F', '#1976D2', '#388E3C', '#FBC02D', '#7B1FA2']; // ✅ 5 colors
 
   const getData = () => {
     return genres.map((genre) => {
@@ -22,7 +23,6 @@ const EventGenresChart = ({ events }) => {
     setData(getData());
   }, [events]);
 
-  // Wait until container has a valid size
   useLayoutEffect(() => {
     const checkSize = () => {
       const rect = containerRef.current?.getBoundingClientRect();
@@ -38,12 +38,11 @@ const EventGenresChart = ({ events }) => {
     const radius = outerRadius * 1.1;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
     return percent ? (
       <text
         x={x}
         y={y}
-        fill="#000000" // black labels for white background
+        fill="#000"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         style={{ fontSize: '12px' }}
@@ -53,7 +52,6 @@ const EventGenresChart = ({ events }) => {
     ) : null;
   };
 
-  // Don’t render chart until container has valid size
   if (!ready) {
     return <div ref={containerRef} style={{ width: '100%', minWidth: 300, height: 400 }} />;
   }
@@ -65,14 +63,15 @@ const EventGenresChart = ({ events }) => {
           <Pie
             data={data}
             dataKey="value"
-            label={renderCustomizedLabel}
             labelLine={false}
+            label={renderCustomizedLabel}
             outerRadius={150}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>
+          <Legend verticalAlign="bottom" align="center" /> {/* ✅ Bonus step */}
         </PieChart>
       </ResponsiveContainer>
     </div>

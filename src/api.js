@@ -1,11 +1,11 @@
-import NProgress from 'nprogress'; // make sure you have this at the top if not already imported
+import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import mockData from './mock-data';
 
 NProgress.configure({
-  showSpinner: false,  // hides the spinning circle
-  speed: 400,          // animation speed
-  minimum: 0.2         // how early the bar appears
+  showSpinner: false,
+  speed: 400,
+  minimum: 0.2
 });
 
 const API_BASE_URL = 'https://dk0a4cdnll.execute-api.eu-central-1.amazonaws.com/dev';
@@ -27,7 +27,7 @@ const checkToken = async (accessToken) => {
 const getToken = async (code) => {
   try {
     const encodedCode = encodeURIComponent(code);
-    const response = await fetch(`https://dk0a4cdnll.execute-api.eu-central-1.amazonaws.com/dev/api/token/${encodedCode}`);
+    const response = await fetch(`${API_BASE_URL}/api/token/${encodedCode}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -40,10 +40,9 @@ const getToken = async (code) => {
     }
 
     return access_token;
-
   } catch (error) {
     console.error('Error fetching access token:', error);
-    return null; // Return null if fetching token failed
+    return null;
   }
 };
 
@@ -93,9 +92,14 @@ export const removeQuery = () => {
  * Get calendar events from Lambda or mock data
  */
 export const getEvents = async () => {
-  // Always use mock data during local development
-  if (import.meta.env.DEV) {
-    console.log("💡 Running in dev mode — using mock data");
+  // ✅ Always use mock data in test or development mode
+  if (
+    process.env.NODE_ENV === 'test' ||
+    process.env.NODE_ENV === 'development' ||
+    (typeof window !== 'undefined' && window.location.href.startsWith('http://localhost'))
+  ) {
+    console.log('🧪 Using mockData for tests or local dev');
+    NProgress.done();
     return mockData;
   }
 
@@ -113,28 +117,23 @@ export const getEvents = async () => {
   removeQuery();
 
   const url = `${API_BASE_URL}/api/get-events/${token}`;
-NProgress.start();
+  NProgress.start();
 
-try {
-  const response = await fetch(url);
-  const result = await response.json();
+  try {
+    const response = await fetch(url);
+    const result = await response.json();
 
-  if (result?.events) {
-    localStorage.setItem('lastEvents', JSON.stringify(result.events));
-    return result.events;
-  } else {
-    // No events returned, fallback to empty array
-    return [];
+    if (result?.events) {
+      localStorage.setItem('lastEvents', JSON.stringify(result.events));
+      return result.events;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    const savedEvents = localStorage.getItem('lastEvents');
+    return savedEvents ? JSON.parse(savedEvents) : [];
+  } finally {
+    NProgress.done();
   }
-
-} catch (error) {
-  console.error('Error fetching events:', error);
-
-  // Offline fallback: return saved events if available
-  const savedEvents = localStorage.getItem('lastEvents');
-  return savedEvents ? JSON.parse(savedEvents) : [];
-} finally {
-  NProgress.done();
-}
-
 };

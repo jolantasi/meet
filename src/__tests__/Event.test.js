@@ -1,21 +1,16 @@
+// src/__tests__/Event.test.js
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Event from "../components/Event";
-import { getEvents } from "../api";
+import mockData from "../mock-data"; // ✅ use mock data, not live API
 
-// helper to escape regex special characters in strings
+// Helper to escape regex special characters in strings
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 describe("<Event /> component", () => {
-  let allEvents;
-  let event;
-
-  beforeAll(async () => {
-    allEvents = await getEvents();
-    event = allEvents[0]; // use the first event
-  });
+  const event = mockData[0]; // ✅ safe, defined test data
 
   test("renders event title correctly", () => {
     render(<Event event={event} />);
@@ -24,7 +19,8 @@ describe("<Event /> component", () => {
 
   test("renders event start time correctly", () => {
     render(<Event event={event} />);
-    const escapedStart = escapeRegExp(event.start.dateTime);
+    const start = event.start?.dateTime || event.start?.date;
+    const escapedStart = escapeRegExp(start);
     expect(screen.queryByText(new RegExp(escapedStart))).toBeInTheDocument();
   });
 
