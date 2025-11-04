@@ -1,5 +1,6 @@
 /* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
 /* Base */
 html, body {
@@ -8,7 +9,7 @@ html, body {
   min-height: 100%;
   width: 100%;
   font-family: 'Roboto', Arial, sans-serif;
-  background-color: #ffffff;
+  background-color: #fcf0da;
   color: #222; /* dark text for white background */
 }
 
@@ -214,3 +215,28 @@ input::placeholder {
   }
 }
 
+.App-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.4rem, 4vw + 1rem, 3.5rem);
+  text-align: center;
+  margin: 0;
+  color: #fff;
+  animation:
+    colorShift 10s linear infinite,
+    flicker 10s infinite alternate;
+  text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+}
+
+@keyframes colorShift {
+  0%   { color: #D32F2F; }  /* red */
+  20%  { color: #1976D2; }  /* blue */
+  40%  { color: #388E3C; }  /* green */
+  80%  { color: #7B1FA2; }  /* purple */
+  100% { color: #D32F2F; }  /* back to red */
+}
+
+/* Flicker effect (softened so colors show cleanly) */
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; }
+}

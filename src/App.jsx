@@ -85,7 +85,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <h1>Meet App</h1>
+       <h1 className="App-title">Meet App</h1>
       <div className="alerts-container">
         {infoAlert && <InfoAlert text={infoAlert} />}
         {errorText && <ErrorAlert text={errorText} />}
